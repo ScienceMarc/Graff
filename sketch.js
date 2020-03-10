@@ -15,17 +15,7 @@ function setup() {
 
 function draw() {
 	background(20);
-	push()
-	fill("white")
-	stroke("black")
-	text(round(frameRate()),0,10); //TODO: hide later
-	for (let i = -round((windowWidth/2)/scale); i < round((windowWidth/2)/scale) + 1; i++) { //X axis units 
-		text(round(i*10)/10,i*scale + windowWidth/2,windowHeight/2 + 10); //TODO: Add support for variable increments
-	}
-	for (let i = -round((windowHeight/2)/scale); i < round((windowHeight/2)/scale) + 1; i++) { //Y axis units
-		text(round(i*10)/10,windowWidth/2, i*scale + windowHeight/2 - 5); //TODO: add support for the complex plane and polar coordinates
-	}
-	pop()
+	
 	push()
 	strokeWeight(2);
 	stroke(40)
@@ -40,6 +30,18 @@ function draw() {
 	line(0,windowHeight/2,windowWidth,windowHeight/2); //Horizontal line
 	line(windowWidth/2,0,windowWidth/2,windowHeight); //Vertical line
 	pop()
+	push()
+	fill("white")
+	stroke("black")
+	text(round(frameRate()),0,10); //TODO: hide later
+	for (let i = -round((windowWidth/2)/scale); i < round((windowWidth/2)/scale) + 1; i++) { //X axis units 
+		text(round(i*10)/10,i*scale + windowWidth/2,windowHeight/2 + 10); //TODO: Add support for variable increments
+	}
+	for (let i = -round((windowHeight/2)/scale); i < round((windowHeight/2)/scale) + 1; i++) { //Y axis units
+		if (-round(i*10)/10 == 0) {continue;}
+		text(-round(i*10)/10,windowWidth/2 + 1, i*scale + windowHeight/2 + 3); //TODO: add support for the complex plane and polar coordinates
+	}
+	pop()
 	stroke("white");
 	
 	strokeWeight(2);
@@ -47,9 +49,13 @@ function draw() {
 	for (let i = 0; i < functions.length; i++) { //Plot every function in the list
 		plot(functions[i].f,functions[i].color)
 	}
+	UI();
 }
 
 function plot(f,color) {
+	if (typeof f != "function") {
+		return;
+	}
 	let points = [];
 	for (let i = -(windowWidth/2)/scale; i < (windowWidth/2)/scale + 1; i+=1/(Math.ceil(scale/2))) { //Computes all of the points along the function
 		points.push(createVector((i*scale)+(windowWidth/2),-(f(i)*scale)+windowHeight/2,i)); //TODO: add support for complex values
@@ -66,7 +72,20 @@ function plot(f,color) {
 	}
 }
 
+let scope = {}
 function addFunction(f) {
-	functions.push(new FunctionObject(math.evaluate(f))); //Allows adding functions using a string
-														  //TODO: add support to use this without the console.
+	functions.push(new FunctionObject(math.evaluate(f,scope))); //Allows adding functions using a string
+														        //TODO: add support to use this without the console.
+}
+
+function UI() {
+	push()
+	stroke("gray");
+	fill("white");
+
+	rect(0,0,windowWidth*0.2,windowHeight);
+	fill("black");
+	textSize(24);
+	text("+", windowWidth*0.2 - 24,24);
+	pop();
 }
