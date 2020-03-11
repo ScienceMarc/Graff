@@ -95,7 +95,7 @@ function UI() {
 		text(functions[i].input, 0, 50 + 50*i);
 	}
 	if (isTyping) {
-		text(typedText, 0, 50 + 50*functions.length);
+		text(typedText + "|", 0, 50 + 50*functions.length);
 	}
 	pop();
 }
