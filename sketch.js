@@ -94,7 +94,11 @@ function plot(index, color) {
 
 
 function addFunction(f) {
-	let sanatized = f.replace(/^[=]/i,"f(x) = ").replace(/^y(\s)*/i, "f(x) ");
+	let sanatized = f;
+	if (/^[^=]*/i.test(sanatized)) {
+		sanatized = "f(x) = " + sanatized;
+	}
+	sanatized = sanatized.replace(/^y(\s)*/i, "f(x) ");
 	console.log(sanatized)
 	functions.push(new FunctionObject(math.evaluate(sanatized, scope),f)); //Allows adding functions using a string
 	//TODO: add support to use this without the console.
