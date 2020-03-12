@@ -49,7 +49,6 @@ function draw() {
 	push();
 	fill("white");
 	stroke("black");
-	text(round(frameRate()), 0, 10); //TODO: hide later
 	for (let i = -round((windowWidth / 2) / scale); i < round((windowWidth / 2) / scale) + 1; i+=increment) { //X axis units 
 		text(round(i * 10) / 10, i * scale + windowWidth / 2 - 3, windowHeight / 2 + 10);
 	}
@@ -130,7 +129,10 @@ function UI() {
 		rect(0, 0, 300, windowHeight);
 		fill("white");
 		textSize(24);
+		push();
+		stroke(0,0,0,0);
 		text("+", 300 - 24, 24);
+		pop();
 		for (let i = 0; i < functions.length; i++) {
 			push()
 			fill(functions[i].color);
@@ -143,13 +145,19 @@ function UI() {
 		pop();
 	}
 	push();
-
+	fill("white");
+	stroke(0,0,0,0);
+	textSize(24);
+	text("≡",5,24);
 	pop();
 }
 
 function mouseClicked() {
 	if (mouseX >= 300 - 24 && mouseX <= 300 && mouseY >= 5 && mouseY <= 24 && showingSidebar) { //Check if clicked on plus button
 		isTyping = true;
+	}
+	if (mouseX >= 5 && mouseX <= 5 + 24 && mouseY >= 5 && mouseY <= 24) {
+		showingSidebar = !showingSidebar;
 	}
 	loop();
 }
