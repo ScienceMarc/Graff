@@ -10,7 +10,6 @@ let scale = 40; //The amount that the chart is zoomed in by. The higher, the mor
 let functions = [];
 let scope = {};
 
-
 function setup() {
 	createCanvas(windowWidth, windowHeight); //Take up the whole window.
 }
@@ -65,7 +64,7 @@ function draw() {
 		plot(i, functions[i].color);
 	}
 	UI();
-	//noLoop()
+	noLoop()
 }
 
 function plot(index, color) {
