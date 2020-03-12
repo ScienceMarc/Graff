@@ -94,7 +94,7 @@ function plot(index, color) {
 
 function addFunction(f) {
 	let sanatized = f;
-	if (/^[^=]*/i.test(sanatized)) {
+	if (/^[^=]*$/i.test(sanatized)) {
 		sanatized = "f(x) = " + sanatized;
 	}
 	sanatized = sanatized.replace(/^y(\s)*/i, "f(x) ");
