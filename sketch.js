@@ -2,6 +2,9 @@ class FunctionObject { //Contains the function as well as the color of the line.
 	constructor(f, input) {
 		this.f = f;
 		this.color = color(random(0, 255), random(0, 255), random(0, 255)); //TODO: come up with a better random color function which ensures good contrast.
+		if (typeof this.f != "function") {
+			this.color = color("white");
+		}
 		this.input = input;
 	}
 }
@@ -116,7 +119,10 @@ function UI() {
 	textSize(24);
 	text("+", windowWidth * 0.2 - 24, 24);
 	for (let i = 0; i < functions.length; i++) {
+		push()
+		fill(functions[i].color);
 		text(functions[i].input, 0, 50 + 50*i);
+		pop()
 	}
 	if (isTyping) {
 		text(typedText + "|", 0, 50 + 50*functions.length);
