@@ -94,13 +94,24 @@ function plot(index, color) {
 	}
 }
 
+function randomFunctionName(length) {
+	var result           = '';
+	var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	var charactersLength = characters.length;
+	for ( var i = 0; i < length; i++ ) {
+	   result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+ }
 
 function addFunction(f) {
 	let sanatized = f;
 	if (/^[^=]*$/i.test(sanatized)) {
-		sanatized = "f(x) = " + sanatized;
+		sanatized = randomFunctionName(8) + "(x) = " + sanatized;
 	}
-	sanatized = sanatized.replace(/^y(\s)*/i, "f(x) ");
+	else {
+		sanatized = sanatized.replace(/^y(\s)*/i, randomFunctionName(8) + "(x) ");
+	}
 	console.log(sanatized)
 	functions.push(new FunctionObject(math.evaluate(sanatized, scope),f)); //Allows adding functions using a string
 	//TODO: add support to use this without the console.
@@ -109,32 +120,37 @@ function addFunction(f) {
 
 let isTyping = false;
 let typedText = "";
+let showingSidebar = true;
 function UI() {
+	if (showingSidebar) {
+		push();
+		stroke(100);
+		fill(50);
+	
+		rect(0, 0, 300, windowHeight);
+		fill("white");
+		textSize(24);
+		text("+", 300 - 24, 24);
+		for (let i = 0; i < functions.length; i++) {
+			push()
+			fill(functions[i].color);
+			text(functions[i].input, 0, 50 + 50*i);
+			pop()
+		}
+		if (isTyping) {
+			text(typedText + "|", 0, 50 + 50*functions.length);
+		}
+		pop();
+	}
 	push();
-	stroke(100);
-	fill(50);
 
-	rect(0, 0, windowWidth * 0.2, windowHeight);
-	fill("white");
-	textSize(24);
-	text("+", windowWidth * 0.2 - 24, 24);
-	for (let i = 0; i < functions.length; i++) {
-		push()
-		fill(functions[i].color);
-		text(functions[i].input, 0, 50 + 50*i);
-		pop()
-	}
-	if (isTyping) {
-		text(typedText + "|", 0, 50 + 50*functions.length);
-	}
 	pop();
 }
 
 function mouseClicked() {
-	if (mouseX >= windowWidth * 0.2 - 24 && mouseX <= windowWidth * 0.2 && mouseY >= 5 && mouseY <= 24) {
+	if (mouseX >= 300 - 24 && mouseX <= 300 && mouseY >= 5 && mouseY <= 24 && showingSidebar) { //Check if clicked on plus button
 		isTyping = true;
 	}
-	//console.log(mouseX)
 	loop();
 }
 
