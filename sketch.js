@@ -3,12 +3,12 @@ class FunctionObject { //Contains the function as well as the color of the line.
 		this.f = f;
 		this.color = color(random(0, 255), random(0, 255), random(0, 255)); //TODO: come up with a better random color function which ensures good contrast.
 		this.input = input;
-		this.points = [];
 	}
 }
 
 let scale = 40; //The amount that the chart is zoomed in by. The higher, the more zommed in. Small numbers lead to problems
 let functions = [];
+let scope = {}
 
 
 function setup() {
@@ -47,12 +47,13 @@ function draw() {
 	stroke("white");
 
 	strokeWeight(2);
-	//scale = frameCount/10;
+	////scale = frameCount/10;
 	for (let i = 0; i < functions.length; i++) { //Plot every function in the list
+		functions[i].points = []
 		plot(i, functions[i].color)
 	}
 	UI();
-	noLoop()
+	//noLoop()
 }
 
 function plot(index, color) {
@@ -60,28 +61,29 @@ function plot(index, color) {
 	if (typeof f != "function") {
 		return;
 	}
-	//let points = [];
-	if (functions[index].points.length == 0) {
-		for (let i = -(windowWidth / 2) / scale; i < (windowWidth / 2) / scale + 1; i += 1 / (Math.ceil(scale / 1))) { //Computes all of the points along the function
-			functions[index].points.push(createVector((i * scale) + (windowWidth / 2), -(f(i) * scale) + windowHeight / 2, i)); //TODO: add support for complex values
+	let points = [];
+	if (points.length == 0 || true) {
+		for (let i = -(windowWidth / 2) / scale; i < (windowWidth / 2) / scale + 1; i += 1 / (Math.ceil(scale / 5))) { //Computes all of the points along the function
+			points.push(createVector((i * scale) + (windowWidth / 2), -(f(i) * scale) + windowHeight / 2, i)); //TODO: add support for complex values
 		}
 	}
 
-	for (let i = 0; i < functions[index].points.length - (functions[index].points.length % 2) - 1; i++) {
-		let grad = (f(functions[index].points[i].z + 0.0001) - f(functions[index].points[i].z)) / 0.0001; //Finds the dervative of the curret point.
+	for (let i = 0; i < points.length - (points.length % 2) - 1; i++) {
+		let grad = (f(points[i].z + 0.0001) - f(points[i].z)) / 0.0001; //Finds the dervative of the curret point.
 		if (Math.abs(grad) > 200 || Number.isNaN(grad)) { //If the line is too steep or invalid make the line invisible
 			stroke(0, 0, 0, 0);
 		}
 		else { //Otherwise draw it using the correct color
 			stroke(color);
 		}
-		line(functions[index].points[i].x, functions[index].points[i].y, functions[index].points[i + 1].x, functions[index].points[i + 1].y); //Links the calculated points with lines to smooth out the curve
+		line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y); //Links the calculated points with lines to smooth out the curve
 	}
 }
 
-let scope = {}
+
 function addFunction(f) {
-	functions.push(new FunctionObject(math.evaluate(f, scope),f)); //Allows adding functions using a string
+	let sanatized = f.replace(/={0}/,"f(x) = ").replace(/^y(\s)*/, "f(x) ");
+	functions.push(new FunctionObject(math.evaluate(sanatized, scope),f)); //Allows adding functions using a string
 	//TODO: add support to use this without the console.
 }
 
@@ -110,7 +112,7 @@ function mouseClicked() {
 	if (mouseX >= windowWidth * 0.2 - 24 && mouseX <= windowWidth * 0.2 && mouseY >= 5 && mouseY <= 24) {
 		isTyping = true;
 	}
-	console.log(mouseX)
+	//console.log(mouseX)
 	loop();
 }
 
@@ -132,4 +134,13 @@ function keyTyped() {
 		typedText += key;
 	}
 	loop();
+}
+function mouseWheel(event) {
+	scale -= event.delta/10;
+	if (scale <= 0) {
+		scale = 5;
+	}
+	//console.log(scale)
+	loop();
+	return false;
 }
