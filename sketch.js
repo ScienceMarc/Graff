@@ -25,9 +25,9 @@ function draw() {
 	push();
 	strokeWeight(2);
 	let increment = max(1,Math.round(40/scale))/Math.ceil(scale/200);
-	console.log("frame")
 	//TODO: add support for polar coordinates and warping due to transformations
-	line(windowWidth/2,10,scale + windowWidth/2,10)
+	offsetIncrement = round(offset.x * (1/scale))
+	////line(windowWidth/2,10,scale + windowWidth/2,10)
 	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement; i+=increment) { //X axis subdivision lines
 		if ((round(i * 10) / 10)%1!=0 && false) {
 			stroke(40);
@@ -36,7 +36,6 @@ function draw() {
 			stroke(80);
 		}
 		line(i * scale + windowWidth / 2 + offset.x, 0, i * scale + windowWidth / 2 + offset.x, windowHeight);
-		console.log(i)
 	}
 	for (let i = -round((windowHeight / 2) / scale); i < round((windowHeight / 2) / scale) + 1; i+=increment) { //Y axis subdivision lines
 		if ((round(i * 10) / 10)%1!=0) {
@@ -54,7 +53,7 @@ function draw() {
 	push();
 	fill("white");
 	stroke("black");
-	for (let i = -round((windowWidth / 2) / scale); i < round((windowWidth / 2) / scale) + 1; i+=increment) { //X axis units 
+	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement; i+=increment) { //X axis units 
 		text(round(i * 10) / 10, i * scale + windowWidth / 2 - 3 + offset.x, windowHeight / 2 + 10);
 	}
 	for (let i = -round((windowHeight / 2) / scale); i < round((windowHeight / 2) / scale) + 1; i+=increment) { //Y axis units
@@ -99,7 +98,7 @@ function plot(index, color) {
 		else { //Otherwise draw it using the correct color
 			stroke(color);
 		}
-		line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y); //Links the calculated points with lines to smooth out the curve
+		line(points[i].x + offset.x, points[i].y, points[i + 1].x + offset.x, points[i + 1].y); //Links the calculated points with lines to smooth out the curve
 	}
 }
 
