@@ -29,7 +29,7 @@ function draw() {
 	offsetIncrement = round(offset.x * (1/scale))
 	////line(windowWidth/2,10,scale + windowWidth/2,10)
 	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement; i+=increment) { //X axis subdivision lines
-		if ((round(i * 10) / 10)%1!=0 && false) {
+		if ((round(i * 10) / 10)%1!=0) {
 			stroke(40);
 		}
 		else {
