@@ -12,26 +12,31 @@ class FunctionObject { //Contains the function as well as the color of the line.
 let scale = 40; //The amount that the chart is zoomed in by. The higher, the more zommed in. Small numbers lead to problems
 let functions = [];
 let scope = {};
+let offset;
+let accuracy = 5;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight); //Take up the whole window.
+	offset = createVector(0,0);
 }
-
+let offsetIncrement = 0;
 function draw() {
 	background(20);
-
 	push();
 	strokeWeight(2);
-	let increment = max(1,Math.round(40/scale))/Math.ceil(scale/200)
+	let increment = max(1,Math.round(40/scale))/Math.ceil(scale/200);
+	console.log("frame")
 	//TODO: add support for polar coordinates and warping due to transformations
-	for (let i = -round((windowWidth / 2) / scale); i < round((windowWidth / 2) / scale) + 1; i+=increment) { //X axis subdivision lines
-		if ((round(i * 10) / 10)%1!=0) {
+	line(windowWidth/2,10,scale + windowWidth/2,10)
+	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement; i+=increment) { //X axis subdivision lines
+		if ((round(i * 10) / 10)%1!=0 && false) {
 			stroke(40);
 		}
 		else {
 			stroke(80);
 		}
-		line(i * scale + windowWidth / 2, 0, i * scale + windowWidth / 2, windowHeight);
+		line(i * scale + windowWidth / 2 + offset.x, 0, i * scale + windowWidth / 2 + offset.x, windowHeight);
+		console.log(i)
 	}
 	for (let i = -round((windowHeight / 2) / scale); i < round((windowHeight / 2) / scale) + 1; i+=increment) { //Y axis subdivision lines
 		if ((round(i * 10) / 10)%1!=0) {
@@ -44,26 +49,31 @@ function draw() {
 	}
 	stroke(150);
 	line(0, windowHeight / 2, windowWidth, windowHeight / 2); //Horizontal line
-	line(windowWidth / 2, 0, windowWidth / 2, windowHeight); //Vertical line
+	line(windowWidth / 2 + offset.x, 0, windowWidth / 2 + offset.x, windowHeight); //Vertical line
 	pop();
 	push();
 	fill("white");
 	stroke("black");
 	for (let i = -round((windowWidth / 2) / scale); i < round((windowWidth / 2) / scale) + 1; i+=increment) { //X axis units 
-		text(round(i * 10) / 10, i * scale + windowWidth / 2 - 3, windowHeight / 2 + 10);
+		text(round(i * 10) / 10, i * scale + windowWidth / 2 - 3 + offset.x, windowHeight / 2 + 10);
 	}
 	for (let i = -round((windowHeight / 2) / scale); i < round((windowHeight / 2) / scale) + 1; i+=increment) { //Y axis units
 		if (-round(i * 10) / 10 == 0) { continue; }
-		text(-round(i * 10) / 10, windowWidth / 2 + 1, i * scale + windowHeight / 2 + 3); //TODO: add support for the complex plane and polar coordinates
+		text(-round(i * 10) / 10, windowWidth / 2 + 1 + offset.x, i * scale + windowHeight / 2 + 3); //TODO: add support for the complex plane and polar coordinates
 	}
 	pop();
 	stroke("white");
 
 	strokeWeight(2);
-	////scale = frameCount/10;
 	for (let i = 0; i < functions.length; i++) { //Plot every function in the list
 		functions[i].points = [];
-		plot(i, functions[i].color);
+		try {
+			plot(i, functions[i].color);
+		}
+		catch(e) {
+			alert(e)
+			functions.pop();
+		}
 	}
 	UI();
 	noLoop()
@@ -71,12 +81,12 @@ function draw() {
 
 function plot(index, color) {
 	let f = functions[index].f;
-	if (typeof f != "function") {
+	if (typeof f != "function") { //Dont plot if it isn't a function e.g. "a = 10"
 		return;
 	}
 	let points = [];
 	if (points.length == 0 || true) {
-		for (let i = -(windowWidth / 2) / scale; i < (windowWidth / 2) / scale + 1; i += 1 / (Math.ceil(scale / 5))) { //Computes all of the points along the function
+		for (let i = -(windowWidth / 2) / scale; i < (windowWidth / 2) / scale + 1; i += 1 / (Math.ceil(scale / accuracy))) { //Computes all of the points along the function
 			points.push(createVector((i * scale) + (windowWidth / 2), -(f(i) * scale) + windowHeight / 2, i)); //TODO: add support for complex values
 		}
 	}
@@ -112,8 +122,12 @@ function addFunction(f) {
 		sanatized = sanatized.replace(/^y(\s)*/i, randomFunctionName(8) + "(x) ");
 	}
 	console.log(sanatized)
-	functions.push(new FunctionObject(math.evaluate(sanatized, scope),f)); //Allows adding functions using a string
-	//TODO: add support to use this without the console.
+	try {
+		functions.push(new FunctionObject(math.evaluate(sanatized, scope),f)); //Allows adding functions using a string
+	}
+	catch(e) {
+		alert(e);
+	}
 }
 
 
@@ -186,7 +200,15 @@ function mouseWheel(event) {
 	if (scale < 25) {
 		scale = 25;
 	}
-	//console.log(scale)
 	loop();
 	return false;
+}
+function mouseDragged() {
+	if (Math.abs(pmouseX - mouseX) > 100) {
+		loop();
+		return;
+	}
+	offset.x -= pmouseX-mouseX;
+	//console.log(pmouseX - mouseX)
+	loop();
 }
