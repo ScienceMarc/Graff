@@ -85,7 +85,7 @@ function plot(index, color) {
 	}
 	let points = [];
 	if (points.length == 0 || true) {
-		for (let i = -(windowWidth / 2) / scale; i < (windowWidth / 2) / scale + 1; i += 1 / (Math.ceil(scale / accuracy))) { //Computes all of the points along the function
+		for (let i = -(windowWidth / 2) / scale - offsetIncrement; i < (windowWidth / 2) / scale + 1 - offsetIncrement; i += 1 / (Math.ceil(scale / accuracy))) { //Computes all of the points along the function
 			points.push(createVector((i * scale) + (windowWidth / 2), -(f(i) * scale) + windowHeight / 2, i)); //TODO: add support for complex values
 		}
 	}
