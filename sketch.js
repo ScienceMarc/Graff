@@ -98,6 +98,10 @@ function plot(index, color) {
 		else { //Otherwise draw it using the correct color
 			stroke(color);
 		}
+		let length = createVector(points[i].x, points[i].y).dist(createVector(points[i + 1].x,points[i + 1].y)); //Find distance between points
+		if (length > 1000) {
+			stroke(0,0,0,0); //Draw line invisibly
+		}
 		line(points[i].x + offset.x, points[i].y, points[i + 1].x + offset.x, points[i + 1].y); //Links the calculated points with lines to smooth out the curve
 	}
 }
