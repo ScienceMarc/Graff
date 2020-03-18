@@ -17,19 +17,21 @@ let accuracy = 5;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight); //Take up the whole window.
-	offset = createVector(0,0);
+	offset = createVector(0, 0);
 }
-let offsetIncrement = 0;
+let offsetIncrement;
 function draw() {
 	background(20);
 	push();
 	strokeWeight(2);
-	let increment = max(1,Math.round(40/scale))/Math.ceil(scale/200);
+	let increment = max(1, Math.round(40 / scale)) / Math.ceil(scale / 200);
 	//TODO: add support for polar coordinates and warping due to transformations
-	offsetIncrement = round(offset.x * (1/scale))
+	offsetIncrement = createVector();
+	offsetIncrement.x = round(offset.x * (1 / scale));
+	offsetIncrement.y = round(offset.y * (1 / scale));
 	////line(windowWidth/2,10,scale + windowWidth/2,10)
-	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement; i+=increment) { //X axis subdivision lines
-		if ((round(i * 10) / 10)%1!=0) {
+	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement.x; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement.x; i += increment) { //X axis subdivision lines
+		if ((round(i * 10) / 10) % 1 != 0) {
 			stroke(40);
 		}
 		else {
@@ -37,28 +39,28 @@ function draw() {
 		}
 		line(i * scale + windowWidth / 2 + offset.x, 0, i * scale + windowWidth / 2 + offset.x, windowHeight);
 	}
-	for (let i = -round((windowHeight / 2) / scale); i < round((windowHeight / 2) / scale) + 1; i+=increment) { //Y axis subdivision lines
-		if ((round(i * 10) / 10)%1!=0) {
+	for (let i = -round((windowHeight / 2) / scale) - offsetIncrement.y; i < round((windowHeight / 2) / scale) + 1 - offsetIncrement.y; i += increment) { //Y axis subdivision lines
+		if ((round(i * 10) / 10) % 1 != 0) {
 			stroke(40);
 		}
 		else {
 			stroke(80);
 		}
-		line(0, i * scale + windowHeight / 2, windowWidth, i * scale + windowHeight / 2);
+		line(0, i * scale + windowHeight / 2 + offset.y, windowWidth, i * scale + windowHeight / 2 + offset.y);
 	}
 	stroke(150);
-	line(0, windowHeight / 2, windowWidth, windowHeight / 2); //Horizontal line
+	line(0, windowHeight / 2 + offset.y, windowWidth, windowHeight / 2 + offset.y); //Horizontal line
 	line(windowWidth / 2 + offset.x, 0, windowWidth / 2 + offset.x, windowHeight); //Vertical line
 	pop();
 	push();
 	fill("white");
 	stroke("black");
-	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement; i+=increment) { //X axis units 
-		text(round(i * 10) / 10, i * scale + windowWidth / 2 - 3 + offset.x, windowHeight / 2 + 10);
+	for (let i = -round((windowWidth / 2) / scale) - offsetIncrement.x; i < round((windowWidth / 2) / scale) + 1 - offsetIncrement.x; i += increment) { //X axis units 
+		text(round(i * 10) / 10, i * scale + windowWidth / 2 - 3 + offset.x, windowHeight / 2 + 10 + offset.y);
 	}
-	for (let i = -round((windowHeight / 2) / scale); i < round((windowHeight / 2) / scale) + 1; i+=increment) { //Y axis units
+	for (let i = -round((windowHeight / 2) / scale) - offsetIncrement.y; i < round((windowHeight / 2) / scale) + 1 - offsetIncrement.y; i += increment) { //Y axis units
 		if (-round(i * 10) / 10 == 0) { continue; }
-		text(-round(i * 10) / 10, windowWidth / 2 + 1 + offset.x, i * scale + windowHeight / 2 + 3); //TODO: add support for the complex plane and polar coordinates
+		text(-round(i * 10) / 10, windowWidth / 2 + 1 + offset.x, i * scale + windowHeight / 2 + 3 + offset.y); //TODO: add support for the complex plane and polar coordinates
 	}
 	pop();
 	stroke("white");
@@ -69,7 +71,7 @@ function draw() {
 		try {
 			plot(i, functions[i].color);
 		}
-		catch(e) {
+		catch (e) {
 			alert(e)
 			functions.pop();
 		}
@@ -85,7 +87,7 @@ function plot(index, color) {
 	}
 	let points = [];
 	if (points.length == 0 || true) {
-		for (let i = -(windowWidth / 2) / scale - offsetIncrement; i < (windowWidth / 2) / scale + 1 - offsetIncrement; i += 1 / (Math.ceil(scale / accuracy))) { //Computes all of the points along the function
+		for (let i = -(windowWidth / 2) / scale - offsetIncrement.x; i < (windowWidth / 2) / scale + 1 - offsetIncrement.x; i += 1 / (Math.ceil(scale / accuracy))) { //Computes all of the points along the function
 			points.push(createVector((i * scale) + (windowWidth / 2), -(f(i) * scale) + windowHeight / 2, i)); //TODO: add support for complex values
 		}
 	}
@@ -98,23 +100,23 @@ function plot(index, color) {
 		else { //Otherwise draw it using the correct color
 			stroke(color);
 		}
-		let length = createVector(points[i].x, points[i].y).dist(createVector(points[i + 1].x,points[i + 1].y)); //Find distance between points
+		let length = createVector(points[i].x, points[i].y).dist(createVector(points[i + 1].x, points[i + 1].y)); //Find distance between points
 		if (length > 1000) {
-			stroke(0,0,0,0); //Draw line invisibly
+			stroke(0, 0, 0, 0); //Draw line invisibly
 		}
-		line(points[i].x + offset.x, points[i].y, points[i + 1].x + offset.x, points[i + 1].y); //Links the calculated points with lines to smooth out the curve
+		line(points[i].x + offset.x, points[i].y + offset.y, points[i + 1].x + offset.x, points[i + 1].y + offset.y); //Links the calculated points with lines to smooth out the curve
 	}
 }
 
 function randomFunctionName(length) {
-	var result           = '';
-	var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	var result = '';
+	var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 	var charactersLength = characters.length;
-	for ( var i = 0; i < length; i++ ) {
-	   result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	for (var i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
 	}
 	return result;
- }
+}
 
 function addFunction(f) {
 	let sanatized = f;
@@ -126,9 +128,9 @@ function addFunction(f) {
 	}
 	console.log(sanatized)
 	try {
-		functions.push(new FunctionObject(math.evaluate(sanatized, scope),f)); //Allows adding functions using a string
+		functions.push(new FunctionObject(math.evaluate(sanatized, scope), f)); //Allows adding functions using a string
 	}
-	catch(e) {
+	catch (e) {
 		alert(e);
 	}
 }
@@ -142,30 +144,30 @@ function UI() {
 		push();
 		stroke(100);
 		fill(50);
-	
+
 		rect(0, 0, 300, windowHeight);
 		fill("white");
 		textSize(24);
 		push();
-		stroke(0,0,0,0);
+		stroke(0, 0, 0, 0);
 		text("+", 300 - 24, 24);
 		pop();
 		for (let i = 0; i < functions.length; i++) {
 			push()
 			fill(functions[i].color);
-			text(functions[i].input, 0, 50 + 50*i);
+			text(functions[i].input, 0, 50 + 50 * i);
 			pop()
 		}
 		if (isTyping) {
-			text(typedText + "|", 0, 50 + 50*functions.length);
+			text(typedText + "|", 0, 50 + 50 * functions.length);
 		}
 		pop();
 	}
 	push();
 	fill("white");
-	stroke(0,0,0,0);
+	stroke(0, 0, 0, 0);
 	textSize(24);
-	text("≡",5,24);
+	text("≡", 5, 24);
 	pop();
 }
 
@@ -199,7 +201,7 @@ function keyTyped() {
 	loop();
 }
 function mouseWheel(event) {
-	scale -= event.delta/10;
+	scale -= event.delta / 10;
 	if (scale < 25) {
 		scale = 25;
 	}
@@ -211,7 +213,11 @@ function mouseDragged() {
 		loop();
 		return;
 	}
-	offset.x -= pmouseX-mouseX;
-	//console.log(pmouseX - mouseX)
+	offset.x -= pmouseX - mouseX;
+	if (Math.abs(pmouseY - mouseY) > 100) {
+		loop();
+		return;
+	}
+	offset.y -= pmouseY - mouseY;
 	loop();
 }
